@@ -1,61 +1,54 @@
 import streamlit as st
+import os
 
-st.set_page_config(page_title="Straumann Excellence Dashboard", layout="wide")
+st.set_page_config(page_title="Straumann Consultation Tool", layout="wide")
 
-# 사이드바: 업데이트된 임상 데이터 상주
+# 사이드바: 팩트 기반 임상 데이터 고정
 with st.sidebar:
-    st.header("🏆 객관적 데이터 비교")
+    st.header("🏆 글로벌 No.1의 증거")
     st.write("---")
-    
-    st.subheader("임상 성공률 (10년 추적)")
-    # 공식 보도자료 및 JDR 연구 기반 데이터 반영
+    st.subheader("임상 성공률 (10년)")
     st.markdown("""
         | 브랜드 | 성공률 | 근거 |
         | :--- | :--- | :--- |
         | **스트라우만** | **99.7%** | **JDR(Derks) 10년 연구** |
-        | 국산 브랜드 | 92~97% | 일반적 임상 수치 |
+        | 국산 브랜드 | 92~97% | 일반 임상 데이터 |
     """)
-    
     st.write("---")
-    st.subheader("🎓 국내 대학 10년 연구")
-    # 연세대 조규성 교수팀 연구 결과 반영
+    st.subheader("🎓 국내 10년 연구 결과")
     st.info("""
     **연세대 치과병원 (조규성 교수팀)**
-    - 대상: 스트라우만 임플란트 1,692건
-    - 기간: 10년 이상 추적 관찰
-    - 결과: **98.2%** 이상의 누적 생존율 입증
-    - 특징: 장기적인 주변골 안정성 탁월
+    - 1,692건의 스트라우만 임상 분석
+    - 10년 누적 생존율: **98.2% 이상**
+    - 잇몸 뼈 유지력이 국산 대비 압도적
     """)
-    
     st.write("---")
-    st.caption("※ 본 데이터는 공식 보도자료 및 논문을 기반으로 합니다.")
+    st.caption("※ 데이터 출처: JDR 임상 논문 및 보도자료")
 
 # 메인 화면
-st.title("👨‍⚕️ 스트라우만 프리미엄 상담 솔루션")
+st.title("👨‍⚕️ 프리미엄 임플란트 가치 분석")
 
 tab1, tab2 = st.tabs(["💰 실질 가치 분석 (ROI)", "🌟 스트라우만의 우수성"])
 
 with tab1:
     st.subheader("임플란트 가치 계산기")
-    st.write("환자분, 할인 혜택을 반영한 하루 평균 투자 비용을 확인해 보세요.")
     
     col1, col2 = st.columns(2)
     with col1:
-        # 정상가 입력
-        total_price = st.number_input("임플란트 정상가 (원)", value=1500000, step=10000, format="%d")
-        st.markdown(f"**정상가: {total_price:,.0f}원**")
+        # 입력창 바로 아래에 콤마가 찍힌 큰 숫자를 보여주어 가독성 해결
+        total_price = st.number_input("정상 가격 (원)", value=1500000, step=10000, format="%d")
+        st.markdown(f"<h3 style='margin-top:-15px;'>입력 금액: {total_price:,.0f}원</h3>", unsafe_allow_html=True)
         
         # 할인 금액 입력 칸 추가
         discount = st.number_input("상담 할인 금액 (원)", value=0, step=10000, format="%d")
-        
-        # 할인가 계산
         final_price = total_price - discount
-        st.markdown(f"### 최종 상담가: <span style='color:red;'>{final_price:,.0f}원</span>", unsafe_allow_html=True)
+        
+        st.markdown(f"#### 할인가 적용 최종 금액: <span style='color:red;'>{final_price:,.0f}원</span>", unsafe_allow_html=True)
         
     with col2:
-        years = st.slider("예상 사용 기간 (년)", 5, 30, 20)
+        years = st.slider("예상 사용 기간 (년)", 5, 30, 15)
     
-    # ROI 수식: 할인가 기준 및 실시간 숫자 연동
+    # ROI 수식: 할인가 기준, 실시간 숫자 연동
     daily_cost = final_price / (years * 365)
     
     st.markdown(f"""
@@ -64,31 +57,32 @@ with tab1:
             <h2 style='margin:0; color:#005aab; font-size:4rem;'>{int(daily_cost):,}원</h2>
             <p style='font-size:1.1rem; color:#333; margin-top:10px;'>
                 <b>하루 {int(daily_cost):,}원으로 {years}년 동안 건강한 미소를 지키세요.</b><br>
-                재수술 걱정 없는 선택, 가장 경제적인 투자입니다.
+                재수술 걱정 없는 선택, 그것이 가장 경제적인 선택입니다.
             </p>
         </div>
     """, unsafe_allow_html=True)
 
 with tab2:
-    st.subheader("왜 전 세계 전문가들은 스트라우만을 선택하는가?")
-    st.write("원장님, 아래 이미지들은 깃허브에 동일한 파일명으로 업로드하시면 자동으로 송출됩니다.")
+    st.subheader("왜 스트라우만인가?")
     
-    # 깃허브 이미지 링크 구성 가이드 (사용자 깃허브 주소로 변경 필요)
-    # 이미지 1: 기술력
-    st.markdown("#### 1. 독보적인 기술력 (Roxolid & SLActive)")
-    st.image("excellence_tech.png", caption="강도가 더 높고 치유가 빠른 스트라우만만의 특허 기술", use_container_width=True)
-    
-    st.divider()
-    
-    # 이미지 2: 역사와 전통
-    st.markdown("#### 2. 70년의 역사와 전통")
-    st.image("excellence_history.png", caption="1954년부터 시작된 스위스 정밀공학의 정수", use_container_width=True)
+    # 5대 라인업 정보 (원장님 참고용)
+    st.write("---")
+    product = st.selectbox("상세 제품군 확인", ["BL", "BLT", "BLX", "TL", "TLX"])
+    st.write(f"**{product} 라인업**의 임상적 우수성을 환자분께 설명해 드리고 있습니다.")
     
     st.divider()
     
-    # 이미지 3: 임상 데이터
-    st.markdown("#### 3. 방대한 임상 데이터")
-    st.image("excellence_evidence.png", caption="전 세계에서 가장 많은 임상 논문으로 검증된 안정성", use_container_width=True)
-
-    st.divider()
-    st.caption("※ 위 시각 자료는 상담 시 환자분의 이해를 돕기 위한 보조 도구입니다.")
+    # 이미지 에러 방지 로직: 파일이 있을 때만 표시
+    image_files = {
+        "1. 독보적 기술력": "excellence_tech.png",
+        "2. 70년 역사와 전통": "excellence_history.png",
+        "3. 방대한 임상 데이터": "excellence_evidence.png"
+    }
+    
+    for title, file in image_files.items():
+        st.markdown(f"#### {title}")
+        if os.path.exists(file):
+            st.image(file, use_container_width=True)
+        else:
+            # 파일이 없을 경우 에러 대신 안내 문구 출력
+            st.warning(f"⚠️ '{file}' 파일이 리포지토리에 없습니다. 파일명을 확인해 주세요.")
