@@ -3,7 +3,7 @@ import os
 from fpdf import FPDF
 from datetime import datetime
 
-# PDF 클래스 정의 (에러 방지용 한글 설정)
+# PDF 클래스 정의 (에러 방지용)
 class StraumannPDF(FPDF):
     def __init__(self):
         super().__init__()
@@ -14,8 +14,8 @@ class StraumannPDF(FPDF):
     def header(self):
         if os.path.exists("NanumGothic.ttf"):
             self.set_font('NanumGothic', '', 20)
-        # 요청하신 제목 반영
-        self.cell(0, 20, '👨‍⚕️ 스트라우만 가치 계산기', 0, 1, 'C')
+        # PDF 제목 (이모지는 폰트 에러 방지를 위해 제외)
+        self.cell(0, 20, '스트라우만 가치 계산기', 0, 1, 'C') 
         self.ln(5)
 
     def footer(self):
@@ -25,20 +25,19 @@ class StraumannPDF(FPDF):
         self.set_text_color(180, 180, 180)
         self.cell(0, 10, '본 견적은 상담용이며, 실제 치료 계획에 따라 변경될 수 있습니다.', 0, 0, 'C')
 
-# --- 사이드바: 임상 데이터 및 견적 정보 ---
+# --- 사이드바: 데이터 및 견적 정보 ---
 with st.sidebar:
     st.header("🏆 스트라우만 임상 데이터")
     st.markdown("""
-        | 구분 | 수치 | 근거 |
+        | 브랜드 | 성공률 | 근거 |
         | :--- | :--- | :--- |
-        | **성공률** | **99.7%** | **JDR(Derks) 10년 연구** |
-        | **생존율** | **98.2%** | **연세대 조규성 교수팀** |
+        | **스트라우만** | **99.7%** | **JDR(Derks) 10년 연구** |
+        | 국산 브랜드 | 92~97% | 일반 임상 수치 |
     """)
     st.info("**🎓 연세대 조규성 교수팀 10년 연구**\n- 1,692건 추적 결과 98.2% 이상의 생존율 입증")
     
     st.divider()
     st.subheader("📄 견적서 정보 입력")
-    # 비운 상태로 제공
     clinic_name = st.text_input("치과명", value="")
     contact_info = st.text_input("연락처", value="")
     patient_name = st.text_input("환자명", value="")
@@ -48,7 +47,7 @@ with st.sidebar:
     generate_pdf = st.button("📥 PDF 견적서 생성", use_container_width=True)
 
 # --- 메인 화면: ROI 및 우수성 탭 ---
-# 제목 이모지 반영
+# UI 제목에는 이모지 사용 가능
 st.title("👨‍⚕️ 스트라우만 가치 계산기")
 
 tab1, tab2 = st.tabs(["💰 장기 가치 분석 (ROI)", "🌟 스트라우만의 우수성"])
@@ -80,6 +79,7 @@ with tab1:
 
 with tab2:
     st.subheader("스트라우만이 신뢰받는 이유")
+    # 이미지 3종 세트
     images = ["excellence_tech.png", "excellence_history.png", "excellence_evidence.jpg"]
     for img in images:
         if os.path.exists(img):
@@ -96,7 +96,7 @@ if generate_pdf:
             if os.path.exists("NanumGothic.ttf"):
                 pdf.set_font('NanumGothic', '', 12)
             
-            # 1. 환자 및 치과 정보
+            # 1. 정보 출력
             pdf.cell(0, 10, f'치과명: {clinic_name} / 연락처: {contact_info}', 0, 1)
             pdf.cell(0, 10, f'환자명: {patient_name} 귀하', 0, 1)
             pdf.cell(0, 10, f'발행일: {datetime.now().strftime("%Y-%m-%d")} / 수술 예정일: {surgery_date}', 0, 1)
@@ -104,10 +104,9 @@ if generate_pdf:
             
             # 2. 금액 상세
             pdf.set_font('NanumGothic', '', 14) if os.path.exists("NanumGothic.ttf") else pdf.set_font('Arial', 'B', 14)
-            pdf.cell(0, 10, f'■ 정상가: {total_p:,.0f}원', 0, 1)
-            pdf.cell(0, 10, f'■ 상담 할인: -{discount:,.0f}원', 0, 1)
+            pdf.cell(0, 10, f'■ 상담 가격: {final_p:,.0f}원 (할인 적용 전 {total_p:,.0f}원)', 0, 1)
             pdf.set_text_color(0, 90, 171) # Straumann Blue
-            pdf.cell(0, 15, f'최종 상담가: {final_p:,.0f}원', 1, 1, 'C')
+            pdf.cell(0, 15, f'하루 평균 투자 비용: {int(daily_roi):,}원 ({years}년 기준)', 1, 1, 'C')
             pdf.set_text_color(0, 0, 0)
             pdf.ln(5)
             
@@ -118,18 +117,19 @@ if generate_pdf:
 
             # 3. 우수성 이미지 (중앙 배치)
             if os.path.exists("excellence_evidence.jpg"):
-                # 중앙 배치 로직: A4(210mm) - 이미지폭(160mm) / 2 = 25mm
+                # 중앙 배치: 여백 25mm, 가로폭 160mm
                 pdf.image("excellence_evidence.jpg", x=25, w=160)
             
             # 4. QR코드 및 각주 (우측 하단)
             if os.path.exists("qrcode.png"):
+                # Y 좌표를 하단으로 배치
                 pdf.image("qrcode.png", x=165, y=240, w=30)
-                pdf.set_xy(150, 272)
+                pdf.set_xy(140, 272)
                 pdf.set_font('NanumGothic', '', 9) if os.path.exists("NanumGothic.ttf") else pdf.set_font('Arial', '', 9)
                 pdf.set_text_color(180, 180, 180) # 라이트 그레이
-                pdf.cell(45, 5, '스트라우만 공식영상', 0, 0, 'R')
+                pdf.cell(55, 5, '스트라우만 공식영상', 0, 0, 'R')
 
-            # PDF 출력 및 인코딩 처리 (오류 방지)
+            # PDF 출력 처리
             pdf_bytes = pdf.output(dest='S')
             if not isinstance(pdf_bytes, bytes):
                 pdf_bytes = pdf_bytes.encode('latin-1', errors='ignore')
@@ -140,6 +140,5 @@ if generate_pdf:
                 file_name=f"Straumann_Estimate_{patient_name}.pdf",
                 mime="application/pdf"
             )
-            st.sidebar.success("성공적으로 생성되었습니다!")
         except Exception as e:
             st.error(f"PDF 생성 중 오류가 발생했습니다: {e}")
