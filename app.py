@@ -92,8 +92,8 @@ with tab2:
     
     # --- 우수성 탭 하단 유튜브 영상 추가 ---
     st.divider()
-    st.subheader("🎥 스트라우만이 알려드리는 임플란트 쉽고 빠르게 이해하기!")
-    st.write("스트라우만 그룹과 함께한 수많은 미소, 당신이 있어 가능했습니다.")
+    st.subheader("🎥 스트라우만이 알려드리는 임플란트 빠르게 이해하기!")
+    st.write("스트라우만의 기술력과 전통으로, '비싼'임플란트가 아닌 '합리적인'임플란트 식립.")
     # 스트라우만 공식 기술 영상 (SLActive)
     st.video("https://www.youtube.com/watch?v=WHcWT5BRTCA")
 
@@ -148,5 +148,6 @@ if generate_pdf:
             )
         except Exception as e:
             st.error(f"PDF 생성 중 오류가 발생했습니다: {e}")
+
 
 
