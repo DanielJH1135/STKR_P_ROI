@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 from fpdf import FPDF
-from datetime import datetime, time
+from datetime import datetime
 
 # PDF 클래스 정의 (에러 방지용 텍스트 전용)
 class StraumannPDF(FPDF):
@@ -13,8 +13,9 @@ class StraumannPDF(FPDF):
 
     def header(self):
         if os.path.exists("NanumGothic.ttf"):
-            self.set_font('NanumGothic', '', 18)
-        self.cell(0, 15, self.title_text, 0, 1, 'C')
+            self.set_font('NanumGothic', '', 20)
+        # PDF 제목 (이모지는 폰트 에러 방지를 위해 제외)
+        self.cell(0, 20, self.title_text, 0, 1, 'C') 
         self.ln(5)
 
     def footer(self):
@@ -26,12 +27,12 @@ class StraumannPDF(FPDF):
 
 # --- 사이드바: 데이터 및 견적 정보 ---
 with st.sidebar:
-    st.header("🏆 스트라우만 데이터")
+    st.header("🏆 스트라우만 임상 데이터")
     st.markdown("""
         | 브랜드 | 성공률 | 근거 |
         | :--- | :--- | :--- |
-        | **스트라우만** | **99.7%** | **JDR 10년 연구** |
-        | 국산 브랜드 | 92~97% | 일반 임상 데이터 |
+        | **스트라우만** | **99.7%** | **JDR(Derks) 10년 연구** |
+        | 국산 브랜드 | 92~97% | 일반 임상 수치 |
     """)
     st.info("**🎓 연세대 조규성 교수팀 10년 연구**\n- 1,692건 추적 결과 98.2% 이상의 생존율 입증")
     
@@ -41,20 +42,19 @@ with st.sidebar:
     contact_info = st.text_input("연락처", value="")
     patient_name = st.text_input("환자명", value="")
     
-    # 수술 예정 일자 및 시간 분리 입력
     col_d, col_t = st.columns(2)
     with col_d:
         surgery_date = st.date_input("수술 일자", datetime.now())
     with col_t:
-        surgery_time = st.time_input("수술 시간", value=time(14, 0)) # 기본값 오후 2시
+        from datetime import time
+        surgery_time = st.time_input("수술 시간", value=time(14, 0))
     
-    # 일자와 시간을 합친 문자열 생성
     full_surgery_dt = f"{surgery_date.strftime('%Y-%m-%d')} {surgery_time.strftime('%H:%M')}"
     
     st.divider()
     generate_pdf = st.button("📥 PDF 안내서 생성", use_container_width=True)
 
-# --- 메인 화면: ROI 및 우수성 탭 (기존과 동일) ---
+# --- 메인 화면: ROI 및 우수성 탭 ---
 st.title("👨‍⚕️ 스트라우만 가치 계산기")
 
 tab1, tab2 = st.tabs(["💰 장기 가치 분석 (ROI)", "🌟 스트라우만의 우수성"])
@@ -68,7 +68,8 @@ with tab1:
         final_p = total_p - discount
         st.markdown(f"**최종 상담 금액: {final_p:,.0f}원**")
     with c2:
-        years = st.slider("예상 사용 기간 (년)", 5, 30, 20)
+        # 예상 사용 기간을 최대 50년으로 상향 조정
+        years = st.slider("예상 사용 기간 (년)", 5, 50, 20)
     
     daily_roi = final_p / (years * 365)
     
@@ -89,7 +90,7 @@ with tab2:
         if os.path.exists(img):
             st.image(img, use_container_width=True)
 
-# --- PDF 생성 로직 (시간 정보 포함) ---
+# --- PDF 생성 로직 ---
 if generate_pdf:
     if not patient_name or not clinic_name:
         st.sidebar.warning("치과명과 환자명을 입력해주세요.")
@@ -101,36 +102,32 @@ if generate_pdf:
             if os.path.exists("NanumGothic.ttf"):
                 pdf.set_font('NanumGothic', '', 12)
             
-            # 1. 정보 출력 (시간 포함)
             pdf.cell(0, 8, f'치과명: {clinic_name} / 연락처: {contact_info}', 0, 1)
             pdf.cell(0, 8, f'환자명: {patient_name} 귀하', 0, 1)
             pdf.cell(0, 8, f'발행일: {datetime.now().strftime("%Y-%m-%d")} / 수술 예정일시: {full_surgery_dt}', 0, 1)
             pdf.ln(5)
             
-            # 2. 금액 및 ROI 요약
             pdf.set_font('NanumGothic', '', 14)
-            pdf.cell(0, 10, f'■ 상담가: {final_p:,.0f}원 (정상가 {total_p:,.0f}원 대비 {discount:,.0f}원 할인)', 0, 1)
+            pdf.cell(0, 10, f'■ 상담 가격: {final_p:,.0f}원 (할인 적용 전 {total_p:,.0f}원)', 0, 1)
             pdf.set_text_color(0, 90, 171)
-            pdf.cell(0, 12, f'하루 평균 투자 비용: {int(daily_roi):,}원 ({years}년 기준)', 1, 1, 'C')
+            pdf.cell(0, 15, f'하루 평균 투자 비용: {int(daily_roi):,}원 ({years}년 기준)', 1, 1, 'C')
             pdf.set_text_color(0, 0, 0)
             pdf.ln(5)
             
             pdf.set_font('NanumGothic', '', 10)
-            pdf.multi_cell(0, 7, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 평생 구강 건강을 위한 가장 합리적인 투자입니다.')
-            pdf.ln(5)
+            pdf.multi_cell(0, 10, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 평생 구강 건강을 위한 가장 합리적인 투자입니다.')
+            pdf.ln(10)
 
-            # 3. 우수성 이미지 (중앙 배치)
             if os.path.exists("excellence_evidence.jpg"):
                 pdf.image("excellence_evidence.jpg", x=25, w=160)
             
-            # 4. QR코드 및 각주
             if os.path.exists("qrcode.png"):
                 qr_y = pdf.get_y() + 5
-                pdf.image("qrcode.png", x=140, y=qr_y, w=25)
-                pdf.set_xy(166, qr_y + 10)
-                pdf.set_font('NanumGothic', '', 8)
+                pdf.image("qrcode.png", x=165, y=240, w=30)
+                pdf.set_xy(140, 272)
+                pdf.set_font('NanumGothic', '', 9)
                 pdf.set_text_color(180, 180, 180)
-                pdf.cell(30, 5, '스트라우만 공식영상', 0, 0, 'L')
+                pdf.cell(55, 5, '스트라우만 공식영상', 0, 0, 'R')
 
             pdf_bytes = pdf.output(dest='S')
             if not isinstance(pdf_bytes, bytes):
