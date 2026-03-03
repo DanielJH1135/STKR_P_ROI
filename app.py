@@ -92,10 +92,10 @@ with tab2:
     
     # --- 우수성 탭 하단 유튜브 영상 추가 ---
     st.divider()
-    st.subheader("🎥 스트라우만 혁신 기술 영상")
-    st.write("스위스 정밀공학이 선사하는 압도적인 치유 속도를 직접 확인해 보세요.")
+    st.subheader("🎥 스트라우만 1,000만개 판매 돌파!")
+    st.write("스트라우만 그룹과 함께한 수많은 미소, 당신이 있어 가능했습니다.")
     # 스트라우만 공식 기술 영상 (SLActive)
-    st.video("https://www.youtube.com/watch?v=zZ3IHrX35kw")
+    st.video("https://www.youtube.com/watch?v=Nj_jx3fh6yE")
 
 # --- PDF 생성 로직 ---
 if generate_pdf:
@@ -148,3 +148,4 @@ if generate_pdf:
             )
         except Exception as e:
             st.error(f"PDF 생성 중 오류가 발생했습니다: {e}")
+
