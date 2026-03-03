@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 from fpdf import FPDF
-from datetime import datetime
+from datetime import datetime, time
 
 # PDF 클래스 정의 (에러 방지용 텍스트 전용)
 class StraumannPDF(FPDF):
@@ -14,7 +14,7 @@ class StraumannPDF(FPDF):
     def header(self):
         if os.path.exists("NanumGothic.ttf"):
             self.set_font('NanumGothic', '', 20)
-        # PDF 제목 (이모지는 폰트 에러 방지를 위해 제외)
+        # PDF 제목
         self.cell(0, 20, self.title_text, 0, 1, 'C') 
         self.ln(5)
 
@@ -46,7 +46,6 @@ with st.sidebar:
     with col_d:
         surgery_date = st.date_input("수술 일자", datetime.now())
     with col_t:
-        from datetime import time
         surgery_time = st.time_input("수술 시간", value=time(14, 0))
     
     full_surgery_dt = f"{surgery_date.strftime('%Y-%m-%d')} {surgery_time.strftime('%H:%M')}"
@@ -68,7 +67,7 @@ with tab1:
         final_p = total_p - discount
         st.markdown(f"**최종 상담 금액: {final_p:,.0f}원**")
     with c2:
-        # 예상 사용 기간을 최대 50년으로 상향 조정
+        # 젊은 층까지 고려하여 최대 50년 설정
         years = st.slider("예상 사용 기간 (년)", 5, 50, 20)
     
     daily_roi = final_p / (years * 365)
@@ -84,11 +83,19 @@ with tab1:
     """, unsafe_allow_html=True)
 
 with tab2:
-    st.subheader("스트라우만이 신뢰받는 이유")
+    st.subheader("왜 스트라우만인가?")
+    # 이미지 3종 세트 출력
     images = ["excellence_tech.png", "excellence_history.png", "excellence_evidence.jpg"]
     for img in images:
         if os.path.exists(img):
             st.image(img, use_container_width=True)
+    
+    # --- 우수성 탭 하단 유튜브 영상 추가 ---
+    st.divider()
+    st.subheader("🎥 스트라우만 혁신 기술 영상")
+    st.write("스위스 정밀공학이 선사하는 압도적인 치유 속도를 직접 확인해 보세요.")
+    # 스트라우만 공식 기술 영상 (SLActive)
+    st.video("https://www.youtube.com/watch?v=zZ3IHrX35kw")
 
 # --- PDF 생성 로직 ---
 if generate_pdf:
