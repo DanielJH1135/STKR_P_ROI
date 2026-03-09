@@ -8,22 +8,28 @@ class StraumannPDF(FPDF):
     def __init__(self, title_text):
         super().__init__()
         self.title_text = title_text
+        # 여백을 설정하여 1페이지 내에 요소가 잘 유지되도록 설정
+        self.set_auto_page_break(auto=True, margin=20)
         if os.path.exists("NanumGothic.ttf"):
             self.add_font('NanumGothic', '', 'NanumGothic.ttf', uni=True)
 
     def header(self):
         if os.path.exists("NanumGothic.ttf"):
             self.set_font('NanumGothic', '', 20)
-        # PDF 제목
-        self.cell(0, 20, self.title_text, 0, 1, 'C') 
-        self.ln(5)
+        # PDF 제목 (높이 20 -> 15로 축소)
+        self.cell(0, 15, self.title_text, 0, 1, 'C') 
+        self.ln(3) # 여백 축소
 
     def footer(self):
-        self.set_y(-15)
+        # 텍스트가 2줄이 되므로 y위치를 -15에서 -20으로 약간 더 위로 올림
+        self.set_y(-20)
         if os.path.exists("NanumGothic.ttf"):
             self.set_font('NanumGothic', '', 8)
         self.set_text_color(180, 180, 180)
-        self.cell(0, 10, '본 안내서는 상담용 자료이며, 정확한 비용은 수술 계획에 따라 변경될 수 있습니다.', 0, 0, 'C')
+        # 요청하신 추가 문구
+        self.cell(0, 5, '※ 임플란트는 관리 여하에 따라 사용기간은 상이합니다.', 0, 1, 'C')
+        # 기존 문구
+        self.cell(0, 5, '본 안내서는 상담용 자료이며, 정확한 비용은 수술 계획에 따라 변경될 수 있습니다.', 0, 0, 'C')
 
 # --- 사이드바: 데이터 및 견적 정보 ---
 with st.sidebar:
@@ -109,29 +115,32 @@ if generate_pdf:
             if os.path.exists("NanumGothic.ttf"):
                 pdf.set_font('NanumGothic', '', 12)
             
-            pdf.cell(0, 8, f'치과명: {clinic_name} / 연락처: {contact_info}', 0, 1)
-            pdf.cell(0, 8, f'환자명: {patient_name} 귀하', 0, 1)
-            pdf.cell(0, 8, f'발행일: {datetime.now().strftime("%Y-%m-%d")} / 수술 예정일시: {full_surgery_dt}', 0, 1)
-            pdf.ln(5)
+            # 셀 간격 8 -> 6으로 축소하여 공간 확보
+            pdf.cell(0, 6, f'치과명: {clinic_name} / 연락처: {contact_info}', 0, 1)
+            pdf.cell(0, 6, f'환자명: {patient_name} 귀하', 0, 1)
+            pdf.cell(0, 6, f'발행일: {datetime.now().strftime("%Y-%m-%d")} / 수술 예정일시: {full_surgery_dt}', 0, 1)
+            pdf.ln(3) # 여백 축소
             
             pdf.set_font('NanumGothic', '', 14)
-            pdf.cell(0, 10, f'■ 상담 가격: {final_p:,.0f}원 (할인 적용 전 {total_p:,.0f}원)', 0, 1)
+            pdf.cell(0, 8, f'■ 상담 가격: {final_p:,.0f}원 (할인 적용 전 {total_p:,.0f}원)', 0, 1)
             pdf.set_text_color(0, 90, 171)
-            pdf.cell(0, 15, f'하루 평균 투자 비용: {int(daily_roi):,}원 ({years}년 기준)', 1, 1, 'C')
+            pdf.cell(0, 12, f'하루 평균 투자 비용: {int(daily_roi):,}원 ({years}년 기준)', 1, 1, 'C') # 15 -> 12 축소
             pdf.set_text_color(0, 0, 0)
-            pdf.ln(5)
+            pdf.ln(3) # 여백 축소
             
             pdf.set_font('NanumGothic', '', 10)
-            pdf.multi_cell(0, 10, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 평생 구강 건강을 위한 가장 합리적인 투자입니다.')
-            pdf.ln(10)
+            # multi_cell 줄 간격 10 -> 6으로 축소
+            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 평생 구강 건강을 위한 가장 합리적인 투자입니다.')
+            pdf.ln(5) # 여백 축소
 
+            # 세로 차지 공간을 줄이기 위해 이미지의 가로 크기(w)를 160 -> 140으로 축소하고 중앙 정렬을 위해 x좌표 35로 이동
             if os.path.exists("excellence_evidence.jpg"):
-                pdf.image("excellence_evidence.jpg", x=25, w=160)
+                pdf.image("excellence_evidence.jpg", x=35, w=140)
             
             if os.path.exists("qrcode.png"):
-                qr_y = pdf.get_y() + 5
-                pdf.image("qrcode.png", x=165, y=240, w=30)
-                pdf.set_xy(140, 272)
+                # QR코드 및 텍스트 위치도 위로 살짝 당김
+                pdf.image("qrcode.png", x=165, y=235, w=30)
+                pdf.set_xy(140, 267)
                 pdf.set_font('NanumGothic', '', 9)
                 pdf.set_text_color(180, 180, 180)
                 pdf.cell(55, 5, '스트라우만 공식영상', 0, 0, 'R')
@@ -148,6 +157,3 @@ if generate_pdf:
             )
         except Exception as e:
             st.error(f"PDF 생성 중 오류가 발생했습니다: {e}")
-
-
-
