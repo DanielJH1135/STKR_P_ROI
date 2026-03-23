@@ -6,24 +6,40 @@ from datetime import datetime, time
 # CSS 주입: 슬라이더 색상 고도화 및 액티브 툴팁 애니메이션
 st.markdown("""
 <style>
-    /* --- 슬라이더 커스텀 --- */
-    /* 1. 슬라이더 동그란 썸(Thumb) 색상 변경 */
+    /* --- 🎄 크리스마스 에디션 탈출: 슬라이더 커스텀 --- */
+    
+    /* 1. 채워지는 바 (왼쪽, 활성화된 부분) */
+    .stSlider div[data-baseweb="slider"] > div > div > div > div:first-child {
+        background-color: #2D7662 !important;
+    }
+    
+    /* 2. 비워진 바 (오른쪽, 비활성화된 부분) - 깔끔한 연회색 */
+    .stSlider div[data-baseweb="slider"] > div > div > div > div:nth-child(2) {
+        background-color: #e2e6e6 !important;
+    }
+    
+    /* 3. 슬라이더 동그란 썸(Thumb) 색상 변경 */
     .stSlider div[data-baseweb="slider"] div[role="slider"] {
         background-color: #2D7662 !important;
         border-color: #2D7662 !important;
     }
-    /* 2. 슬라이더 상단 숫자(붉은색)를 다크그린으로 변경 */
+    
+    /* 4. 마우스 올렸을 때 생기는 붉은 링(그림자) 색상을 다크그린으로 변경 */
+    .stSlider div[data-baseweb="slider"] div[role="slider"]:hover,
+    .stSlider div[data-baseweb="slider"] div[role="slider"]:focus,
+    .stSlider div[data-baseweb="slider"] div[role="slider"]:focus-visible {
+        box-shadow: 0 0 0 0.2rem rgba(45, 118, 98, 0.25) !important;
+        outline: none !important;
+    }
+
+    /* 5. 슬라이더 상단 숫자(붉은색)를 다크그린으로 변경 */
     .stSlider div[data-baseweb="slider"] div[role="slider"] > div {
         color: #2D7662 !important; 
     }
-    /* 3. 슬라이더 라벨 글씨 색상 고정 (붉은색 방지) */
+    
+    /* 6. 슬라이더 라벨 글씨 색상 고정 */
     .stSlider label p {
         color: #333333 !important;
-    }
-    /* 4. 슬라이더 채워지는 바(Track Fill) 색상 변경 
-       (기존의 빈 영역까지 모두 칠해버리는 문제 수정을 위해 선택자 세밀화) */
-    .stSlider div[data-baseweb="slider"] > div > div > div:nth-child(2) {
-        background-color: #2D7662 !important;
     }
 
     /* --- 액티브 툴팁(마우스 오버) 커스텀 --- */
@@ -106,15 +122,15 @@ class StraumannPDF(FPDF):
 with st.sidebar:
     st.header("🏆 스트라우만 임상 데이터")
     
-    # 💥 커스텀 클래스를 적용한 액티브 툴팁으로 교체
+    # 성공률 -> 장기생존률 변경, 10년이상 임상데이터 툴팁(title 속성) 추가
     st.markdown("""
         | 브랜드 | 장기생존률 | 근거 |
         | :--- | :--- | :--- |
-        | **스트라우만** | **99.7%** | <span class="active-tooltip">10년이상의 임상데이터 연구논문<span class="tooltip-content">van Velzen FJ, et al. J Clin Periodontal. 2015; 374 implants, 177 patients, 10-year follow-up</span></span> |
+        | **스트라우만** | **99.7%** | **<span class="active-tooltip">10년이상의 임상데이터 연구논문<span class="tooltip-content">van Velzen FJ, et al. J Clin Periodontal. 2015; 374 implants, 177 patients, 10-year follow-up</span></span>** |
         | 국산 브랜드 | 92~97% | 일반 임상 수치 |
     """, unsafe_allow_html=True)
     
-    # 연세대 연구 내용
+    # 연세대 연구 내용 색상 변경 (배경: Straumann gray, 텍스트: White)
     st.markdown("""
         <div style="background-color: #36393A; color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
             <b>🎓 연세대 조규성 교수팀 10년 연구</b><br>
