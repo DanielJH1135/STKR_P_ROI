@@ -1,3 +1,0 @@
-[theme]
-primaryColor="#2D7662"
-base="light"
