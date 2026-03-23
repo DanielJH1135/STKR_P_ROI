@@ -3,16 +3,73 @@ import os
 from fpdf import FPDF
 from datetime import datetime, time
 
-# 슬라이더 색상 변경을 위한 CSS 주입 (Dark Green: #2D7662)
+# CSS 주입: 슬라이더 색상 고도화 및 액티브 툴팁 애니메이션
 st.markdown("""
 <style>
-    /* 슬라이더 동그란 버튼 색상 변경 */
+    /* --- 슬라이더 커스텀 --- */
+    /* 1. 슬라이더 동그란 썸(Thumb) 색상 변경 */
     .stSlider div[data-baseweb="slider"] div[role="slider"] {
         background-color: #2D7662 !important;
+        border-color: #2D7662 !important;
     }
-    /* 슬라이더 채워지는 바(Track) 색상 변경 */
-    .stSlider div[data-baseweb="slider"] > div > div > div:first-child {
+    /* 2. 슬라이더 상단 숫자(붉은색)를 다크그린으로 변경 */
+    .stSlider div[data-baseweb="slider"] div[role="slider"] > div {
+        color: #2D7662 !important; 
+    }
+    /* 3. 슬라이더 라벨 글씨 색상 고정 (붉은색 방지) */
+    .stSlider label p {
+        color: #333333 !important;
+    }
+    /* 4. 슬라이더 채워지는 바(Track Fill) 색상 변경 
+       (기존의 빈 영역까지 모두 칠해버리는 문제 수정을 위해 선택자 세밀화) */
+    .stSlider div[data-baseweb="slider"] > div > div > div:nth-child(2) {
         background-color: #2D7662 !important;
+    }
+
+    /* --- 액티브 툴팁(마우스 오버) 커스텀 --- */
+    .active-tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #005aab; /* 강조할 파란색 */
+        font-weight: bold;
+        border-bottom: 2px dashed #005aab;
+    }
+    .active-tooltip .tooltip-content {
+        visibility: hidden;
+        width: 300px;
+        background-color: #36393A; /* 스트라우만 그레이 */
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        padding: 12px;
+        position: absolute;
+        z-index: 999;
+        bottom: 150%; /* 텍스트 위로 팝업 */
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        font-size: 0.85rem;
+        box-shadow: 0px 10px 15px rgba(0,0,0,0.2);
+        line-height: 1.4;
+    }
+    /* 말풍선 꼬리 */
+    .active-tooltip .tooltip-content::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -8px;
+        border-width: 8px;
+        border-style: solid;
+        border-color: #36393A transparent transparent transparent;
+    }
+    /* 마우스 호버 시 말풍선 애니메이션 작동 */
+    .active-tooltip:hover .tooltip-content {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -49,15 +106,15 @@ class StraumannPDF(FPDF):
 with st.sidebar:
     st.header("🏆 스트라우만 임상 데이터")
     
-    # 성공률 -> 장기생존률 변경, 10년이상 임상데이터 툴팁(title 속성) 추가
+    # 💥 커스텀 클래스를 적용한 액티브 툴팁으로 교체
     st.markdown("""
         | 브랜드 | 장기생존률 | 근거 |
         | :--- | :--- | :--- |
-        | **스트라우만** | **99.7%** | **<span title="van Velzen FJ, et al. J Clin Periodontal. 2015; 374 implants, 177 patients, 10-year follow -up" style="cursor:help; border-bottom:1px dotted #666;">10년이상의 임상데이터 연구논문</span>** |
+        | **스트라우만** | **99.7%** | <span class="active-tooltip">10년이상의 임상데이터 연구논문<span class="tooltip-content">van Velzen FJ, et al. J Clin Periodontal. 2015; 374 implants, 177 patients, 10-year follow-up</span></span> |
         | 국산 브랜드 | 92~97% | 일반 임상 수치 |
     """, unsafe_allow_html=True)
     
-    # 연세대 연구 내용 색상 변경 (배경: Straumann gray, 텍스트: White)
+    # 연세대 연구 내용
     st.markdown("""
         <div style="background-color: #36393A; color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
             <b>🎓 연세대 조규성 교수팀 10년 연구</b><br>
