@@ -3,6 +3,20 @@ import os
 from fpdf import FPDF
 from datetime import datetime, time
 
+# 슬라이더 색상 변경을 위한 CSS 주입 (Dark Green: #2D7662)
+st.markdown("""
+<style>
+    /* 슬라이더 동그란 버튼 색상 변경 */
+    .stSlider div[data-baseweb="slider"] div[role="slider"] {
+        background-color: #2D7662 !important;
+    }
+    /* 슬라이더 채워지는 바(Track) 색상 변경 */
+    .stSlider div[data-baseweb="slider"] > div > div > div:first-child {
+        background-color: #2D7662 !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # PDF 클래스 정의 (에러 방지용 텍스트 전용)
 class StraumannPDF(FPDF):
     def __init__(self, title_text):
@@ -34,13 +48,22 @@ class StraumannPDF(FPDF):
 # --- 사이드바: 데이터 및 견적 정보 ---
 with st.sidebar:
     st.header("🏆 스트라우만 임상 데이터")
+    
+    # 성공률 -> 장기생존률 변경, 10년이상 임상데이터 툴팁(title 속성) 추가
     st.markdown("""
-        | 브랜드 | 성공률 | 근거 |
+        | 브랜드 | 장기생존률 | 근거 |
         | :--- | :--- | :--- |
-        | **스트라우만** | **99.7%** | **JDR(Derks) 10년 연구** |
+        | **스트라우만** | **99.7%** | **<span title="van Velzen FJ, et al. J Clin Periodontal. 2015; 374 implants, 177 patients, 10-year follow -up" style="cursor:help; border-bottom:1px dotted #666;">10년이상의 임상데이터 연구논문</span>** |
         | 국산 브랜드 | 92~97% | 일반 임상 수치 |
-    """)
-    st.info("**🎓 연세대 조규성 교수팀 10년 연구**\n- 1,692건 추적 결과 98.2% 이상의 생존율 입증")
+    """, unsafe_allow_html=True)
+    
+    # 연세대 연구 내용 색상 변경 (배경: Straumann gray, 텍스트: White)
+    st.markdown("""
+        <div style="background-color: #36393A; color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+            <b>🎓 연세대 조규성 교수팀 10년 연구</b><br>
+            <span style="font-size: 0.9em;">- 1,692건 추적 결과 98.2% 이상의 장기생존율 입증</span>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.divider()
     st.subheader("📄 안내서 정보 입력")
@@ -62,7 +85,7 @@ with st.sidebar:
 # --- 메인 화면: ROI 및 우수성 탭 ---
 st.title("👨‍⚕️ 스트라우만 가치 계산기")
 
-tab1, tab2 = st.tabs(["💰 장기 가치 분석 (ROI)", "🌟 스트라우만의 우수성"])
+tab1, tab2 = st.tabs(["💰 장기 가치 분석 (ROI)", "🌟 오래쓰는 스트라우만"])
 
 with tab1:
     st.subheader("실질 투자 가치 확인")
@@ -75,13 +98,22 @@ with tab1:
     with c2:
         # 젊은 층까지 고려하여 최대 50년 설정
         years = st.slider("예상 사용 기간 (년)", 5, 50, 20)
+        
+        # 슬라이더 하단 밝은 회색 각주 추가
+        st.markdown("""
+            <div style="color: #A9A9A9; font-size: 0.85rem; margin-top: -10px; line-height: 1.4;">
+                * 의사 판단하에 측정된 수치입니다.<br>
+                * 환자분의 건강상태 / 관리 여하에 따라 상이할 수 있습니다.
+            </div>
+        """, unsafe_allow_html=True)
     
     daily_roi = final_p / (years * 365)
     
+    # 좌측 바(border-left) 및 금액 색상 Mint Green(#46B98C)으로 변경
     st.markdown(f"""
-        <div style='background-color:#f8f9fa; padding:40px; border-radius:15px; border-left: 10px solid #005aab; text-align:center;'>
+        <div style='background-color:#f8f9fa; padding:40px; border-radius:15px; border-left: 10px solid #46B98C; text-align:center; margin-top: 20px;'>
             <p style='font-size:1.2rem; color:#555;'>환자분의 하루 평균 투자 비용은</p>
-            <h2 style='margin:0; color:#005aab; font-size:4.5rem;'>{int(daily_roi):,}원</h2>
+            <h2 style='margin:0; color:#46B98C; font-size:4.5rem;'>{int(daily_roi):,}원</h2>
             <p style='font-size:1.1rem; color:#333; margin-top:10px;'>
                 <b>하루 {int(daily_roi):,}원으로 {years}년 동안 건강한 미소를 유지하세요.</b>
             </p>
@@ -89,7 +121,7 @@ with tab1:
     """, unsafe_allow_html=True)
 
 with tab2:
-    st.subheader("왜 스트라우만인가?")
+    st.subheader("신뢰의 브랜드, 스트라우만. 그 이유는?")
     # 이미지 3종 세트 출력
     images = ["excellence_tech.png", "excellence_history.png", "excellence_evidence.jpg"]
     for img in images:
@@ -99,7 +131,7 @@ with tab2:
     # --- 우수성 탭 하단 유튜브 영상 추가 ---
     st.divider()
     st.subheader("🎥 스트라우만이 알려드리는 임플란트 빠르게 이해하기!")
-    st.write("스트라우만의 기술력과 전통으로, '비싼'임플란트가 아닌 '합리적인'임플란트 식립.")
+    st.write("스트라우만의 기술력과 전통으로, 건강하게 오래쓰는 임플란트. 진짜 나를 위한 선택.")
     # 스트라우만 공식 기술 영상 (SLActive)
     st.video("https://www.youtube.com/watch?v=WHcWT5BRTCA")
 
