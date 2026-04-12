@@ -229,8 +229,8 @@ if generate_pdf:
             pdf.ln(5)
 
             # PDF에도 상세페이지 이미지 추가 (파일명 수정)
-            if os.path.exists("상세페이지1.png"):
-                pdf.image("상세페이지1.png", x=35, w=140)
+            if os.path.exists("상세페이지 1.png"):
+                pdf.image("상세페이지 1.png", x=35, w=140)
             
             if os.path.exists("qrcode.png"):
                 pdf.image("qrcode.png", x=165, y=235, w=30)
