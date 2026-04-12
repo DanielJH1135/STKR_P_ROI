@@ -180,7 +180,7 @@ with tab1:
 
 with tab2:
     st.subheader("신뢰의 브랜드, 스트라우만. 그 이유는?")
-    # 요청하신 파일명 적용 (상세페이지1, 2, 3)
+    # 웹 화면에서는 상세페이지 1, 2, 3을 모두 보여줌
     detail_images = ["상세페이지 1.png", "상세페이지 2.png", "상세페이지 3.png"]
     for img in detail_images:
         if os.path.exists(img):
@@ -228,9 +228,11 @@ if generate_pdf:
             pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 평생 구강 건강을 위한 가장 합리적인 투자입니다.')
             pdf.ln(5)
 
-            # PDF에도 상세페이지 이미지 추가 (파일명 수정)
-            if os.path.exists("상세페이지 1.png"):
-                pdf.image("상세페이지 1.png", x=35, w=140)
+            # --- 💡 PDF에만 다시 'excellence_evidence.jpg'를 넣어 1페이지로 유지 ---
+            if os.path.exists("excellence_evidence.jpg"):
+                pdf.image("excellence_evidence.jpg", x=35, w=140)
+            elif os.path.exists("excellence_evidence.png"): # 혹시 png일 경우 대비
+                pdf.image("excellence_evidence.png", x=35, w=140)
             
             if os.path.exists("qrcode.png"):
                 pdf.image("qrcode.png", x=165, y=235, w=30)
