@@ -52,6 +52,7 @@ st.markdown("""
         margin-top: 50px;
         border-top: 1px solid #eee;
         padding-top: 20px;
+        line-height: 1.6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -72,12 +73,13 @@ class StraumannPDF(FPDF):
         self.ln(3)
 
     def footer(self):
-        self.set_y(-25)
+        self.set_y(-30) # 문구 추가로 인한 높이 조정
         if os.path.exists("NanumGothic.ttf"):
             self.set_font('NanumGothic', '', 8)
         self.set_text_color(180, 180, 180)
         self.cell(0, 5, '※ 임플란트는 관리 여하에 따라 사용기간은 상이합니다.', 0, 1, 'C')
         self.cell(0, 5, '본 자료는 환자 상담용 참고자료이며, 무단 전재 및 온라인 게시를 금지합니다.', 0, 1, 'C')
+        self.cell(0, 5, '환자의 식별 정보는 저장되지 않고, 상담 종료 시 삭제됩니다.', 0, 1, 'C')
         self.cell(0, 5, '본 안내서는 상담용 자료이며, 정확한 비용은 수술 계획에 따라 변경될 수 있습니다.', 0, 0, 'C')
 
 # --- 사이드바: 데이터 및 견적 정보 ---
@@ -114,8 +116,11 @@ with st.sidebar:
         </table>
     """, unsafe_allow_html=True)
     
+    # 1. 사이드바 추가 문구 (작게 기재)
+    st.caption("개인별 차이가 있을 수 있습니다.")
+    
     st.markdown("""
-        <div style="background-color: #36393A; color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+        <div style="background-color: #36393A; color: white; padding: 15px; border-radius: 8px; margin-top: 5px;">
             <b>🎓 연세대 조규성 교수팀 10년 연구</b><br>
             <span style="font-size: 0.9em;">- 1,692건 추적 결과 98.2% 이상의 장기생존율 입증</span>
         </div>
@@ -172,16 +177,17 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
 
+    # 1. 메인페이지 하단 보안 주의 문구 추가
     st.markdown("""
         <div class="footer-disclaimer">
-            본 상담툴은 의료진의 상담 참고용이며, 외부(SNS, 블로그 등)으로 유출을 금지합니다.
+            본 상담툴은 의료진의 상담 참고용이며, 외부(SNS, 블로그 등)으로 유출을 금지합니다.<br>
+            환자의 식별 정보는 저장되지 않고, 상담 종료 시 삭제됩니다.
         </div>
     """, unsafe_allow_html=True)
 
 with tab2:
     st.subheader("신뢰의 브랜드, 스트라우만. 그 이유는?")
-    # 웹 화면에서는 상세페이지 1, 2, 3을 모두 보여줌
-    detail_images = ["상세페이지 1.png", "상세페이지 2.png", "상세페이지 3.png"]
+    detail_images = ["상세페이지1.png", "상세페이지2.png", "상세페이지3.png"]
     for img in detail_images:
         if os.path.exists(img):
             st.image(img, use_container_width=True)
@@ -225,13 +231,13 @@ if generate_pdf:
             pdf.ln(3)
             
             pdf.set_font('NanumGothic', '', 10)
-            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 평생 구강 건강을 위한 가장 합리적인 투자입니다.')
+            # 3. PDF 메인 문구 교체
+            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 구강 건강을 위한 장기적인 관리 옵션입니다.')
             pdf.ln(5)
 
-            # --- 💡 PDF에만 다시 'excellence_evidence.jpg'를 넣어 1페이지로 유지 ---
             if os.path.exists("excellence_evidence.jpg"):
                 pdf.image("excellence_evidence.jpg", x=35, w=140)
-            elif os.path.exists("excellence_evidence.png"): # 혹시 png일 경우 대비
+            elif os.path.exists("excellence_evidence.png"):
                 pdf.image("excellence_evidence.png", x=35, w=140)
             
             if os.path.exists("qrcode.png"):
