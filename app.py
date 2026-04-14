@@ -187,7 +187,7 @@ with tab1:
 
 with tab2:
     st.subheader("신뢰의 브랜드, 스트라우만. 그 이유는?")
-    detail_images = ["상세페이지1.png", "상세페이지2.png", "상세페이지3.png"]
+    detail_images = ["상세페이지 1.png", "상세페이지 2.png", "상세페이지 3.png"]
     for img in detail_images:
         if os.path.exists(img):
             st.image(img, use_container_width=True)
