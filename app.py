@@ -162,7 +162,8 @@ with tab1:
         st.markdown("""
             <div style="color: #A9A9A9; font-size: 0.85rem; margin-top: 10px; line-height: 1.4;">
                 * 의사 판단하에 측정된 수치입니다.<br>
-                * 환자분의 건강상태 / 관리 여하에 따라 상이할 수 있습니다.
+                * 환자분의 건강상태 / 관리 여하에 따라 상이할 수 있습니다. <br>
+                * 해당 계산결과는 이해를 돕기위한 단순환산 예시입니다.
             </div>
         """, unsafe_allow_html=True)
     
@@ -232,7 +233,7 @@ if generate_pdf:
             
             pdf.set_font('NanumGothic', '', 10)
             # 3. PDF 메인 문구 교체
-            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 구강 건강을 위한 장기적인 관리 옵션입니다.')
+            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다. 구강 건강을 위한 장기적인 관리 옵션입니다. 또한 해당 계산결과는 이해를 돕기위한 계산입니다.')
             pdf.ln(5)
 
             if os.path.exists("excellence_evidence.jpg"):
