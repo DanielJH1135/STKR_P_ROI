@@ -116,7 +116,6 @@ with st.sidebar:
         </table>
     """, unsafe_allow_html=True)
     
-    # 1. 사이드바 추가 문구 (작게 기재)
     st.caption("개인별 차이가 있을 수 있습니다.")
     
     st.markdown("""
@@ -178,7 +177,6 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
 
-    # 1. 메인페이지 하단 보안 주의 문구 추가
     st.markdown("""
         <div class="footer-disclaimer">
             본 상담툴은 의료진의 상담 참고용이며, 외부(SNS, 블로그 등)으로 유출을 금지합니다.<br>
@@ -222,18 +220,25 @@ if generate_pdf:
             
             pdf.set_font('NanumGothic', '', 9)
             pdf.set_text_color(100, 100, 100)
-            pdf.cell(0, 6, '본 계산 결과는 단순 시뮬레이션이며, 실제 진료비와 치료 결과는 환자의 상태에 따라 다를 수 있음.', 0, 1)
+            # 요청하신 대로 '다를 수 있습니다'로 수정
+            pdf.cell(0, 6, '본 계산 결과는 단순 시뮬레이션이며, 실제 진료비와 치료 결과는 환자의 상태에 따라 다를 수 있습니다.', 0, 1)
             pdf.ln(2)
 
             pdf.set_font('NanumGothic', '', 14)
             pdf.set_text_color(70, 185, 140) # Mint Green (#46B98C)
             pdf.cell(0, 12, f'하루 평균 투자 비용: {int(daily_roi):,}원 ({years}년 기준)', 1, 1, 'C')
+            
+            # 박스 바로 아래에 밝은 회색 안내 문구 추가
+            pdf.set_font('NanumGothic', '', 8)
+            pdf.set_text_color(180, 180, 180) # 밝은 회색
+            pdf.cell(0, 6, '* 해당 결과는 이해를 돕기 위한 계산입니다.', 0, 1, 'C')
+            
             pdf.set_text_color(0, 0, 0)
             pdf.ln(3)
             
             pdf.set_font('NanumGothic', '', 10)
-            # 3. PDF 메인 문구 교체
-            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다.\n구강 건강을 위한 장기적인 관리 옵션입니다. 또한 해당 계산결과는 이해를 돕기위한 계산입니다.')
+            # 에러 방지를 위해 한 줄로 정리된 multi_cell 코드
+            pdf.multi_cell(0, 6, f'환자분께서 {years}년 동안 사용하실 경우, 하루 평균 비용은 약 {int(daily_roi):,}원입니다.\n구강 건강을 위한 장기적인 관리 옵션입니다.')
             pdf.ln(5)
 
             if os.path.exists("excellence_evidence.jpg"):
